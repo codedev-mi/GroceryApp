@@ -1,50 +1,114 @@
-# Welcome to your Expo app 👋
+# 📱 Instamart Clone – React Native Expo App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A **premium, Zepto-inspired grocery delivery application** built with **React Native and Expo**.  
+This project focuses on **realistic mobile UI/UX**, clean architecture, and modern state management.
 
-## Get started
+---
 
-1. Install dependencies
+## ✨ Highlights
 
-   ```bash
-   npm install
-   ```
+- ⚡ Fast, mobile-first UI inspired by **Zepto**
+- 🟡 Brand theme with primary color **#FFD41D**
+- 🧺 Smooth cart & quantity management
+- 🧭 File-based navigation with Expo Router
+- 🧠 Scalable Redux Toolkit architecture
+- 🌐 Works on **Android, iOS, and Web**
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🚀 Features
 
-In the output, you'll find options to open the app in a
+- **Home Dashboard**
+  - Delivery header (“Delivery in 10 mins ⚡”)
+  - Product cards with images, prices, and quantity controls
+- **Categories**
+  - Grid-based category listing
+  - Dynamic category → product navigation
+- **Product Management**
+  - Add / remove items with live quantity update
+- **Shopping Cart**
+  - Cart summary with total price
+  - Real-time Redux-powered updates
+- **Authentication Flow (UI)**
+  - Login → OTP → App navigation
+- **Performance Optimized**
+  - Uses `expo-image` for efficient image loading
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠️ Tech Stack
 
-## Get a fresh project
+| Layer | Technology |
+|-----|-----------|
+| Framework | React Native with Expo (SDK 54) |
+| Navigation | Expo Router (file-based routing) |
+| State Management | Redux Toolkit |
+| UI Styling | React Native StyleSheet |
+| Icons | @expo/vector-icons |
+| Images | expo-image |
+| Language | TypeScript |
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+## 📂 Project Structure
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```text
+app/
+├── _layout.tsx
+├── (auth)/
+│   ├── login.tsx
+│   └── otp.tsx
+├── (app)/
+│   └── (tabs)/
+│       ├── index.tsx        # Home
+│       ├── categories.tsx  # Categories
+│       └── cart.tsx        # Cart
+├── category/
+│   └── [id].tsx            # Dynamic category products
+├── components/
+│   ├── Container.tsx
+│   └── ProductItem.tsx
+├── data/
+│   └── dummyData.ts
+store/
+├── index.ts
+└── slices/
+    └── cartSlice.ts
 
-## Learn more
+Prerequisites
+Make sure you have the following installed:
+Node.js (LTS recommended)
+Git
+Expo CLI (optional but recommended)
+npm install -g expo
 
-To learn more about developing your project with Expo, look at the following resources:
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
+git clone https://github.com/yourusername/instamart-clone.git
+cd instamart-clone
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+2️⃣ Install Dependencies
+npm install
 
-## Join the community
+3️⃣ Install Expo Dependencies (if required)
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar @expo/vector-icons expo-image
 
-Join our community of developers creating universal apps.
+▶️ Running the App
+npx expo start
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Run Options
+
+📱 Android / iOS (Real Device): Scan QR using Expo Go
+🤖 Android Emulator: Press a
+🍎 iOS Simulator (Mac only): Press i
+🌐 Web: Press w
+
+📦 Key Dependencies
+Package	Description
+expo	Expo SDK
+expo-router	File-based navigation
+@reduxjs/toolkit	State management
+react-redux	Redux bindings
+expo-image	Optimized image rendering
+@expo/vector-icons	Icon library
+react-native-safe-area-context	Safe area handling
