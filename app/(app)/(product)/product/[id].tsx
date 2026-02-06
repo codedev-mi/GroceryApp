@@ -3,11 +3,13 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { colors } from '@/colors';
 import { products } from '@/data/dummyData';
 import { addToCart } from '@/store/slices/cartSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { RootState } from '@/store';
 import { Product } from '@/types';
 
 export default function ProductDetail() {
@@ -15,9 +17,16 @@ export default function ProductDetail() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
 
   const product: Product | undefined = products.find(p => p.id === Number(id));
+
+  // Check valid product first to avoid hook errors if we were to put hooks after early return
+  // However, hooks must be called unconditionally. 
+  // Let's rely on selector returning false if id not found, but we need to match id.
+
+  const isFavorite = useSelector((state: RootState) =>
+    state.wishlist.items.some(p => p.id === Number(id))
+  );
 
   if (!product) {
     return (
@@ -47,6 +56,12 @@ export default function ProductDetail() {
     router.back();
   };
 
+  const handleWishlist = () => {
+    if (product) {
+      dispatch(toggleWishlist(product));
+    }
+  };
+
   const increment = () => setQuantity(q => q + 1);
   const decrement = () => setQuantity(q => (q > 1 ? q - 1 : 1));
 
@@ -73,7 +88,7 @@ export default function ProductDetail() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setIsFavorite(!isFavorite)}
+              onPress={handleWishlist}
               style={styles.iconButton}
             >
               <Ionicons

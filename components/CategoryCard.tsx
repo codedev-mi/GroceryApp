@@ -24,7 +24,7 @@ export default function CategoryCard({
 const styles = StyleSheet.create({
   categoryCard: {
     width: "100%",
-    aspectRatio: 1,
+    height: 140,
     padding: 12,
     alignItems: "center",
     backgroundColor: "#FFF",

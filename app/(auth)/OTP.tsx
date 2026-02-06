@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function OTP() {
   return (
@@ -8,7 +8,7 @@ export default function OTP() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.replace('/(app)/(tabs)')}
+        onPress={() => router.replace('/' as any)}
       >
         <Text style={styles.btnText}>Enter App</Text>
       </TouchableOpacity>

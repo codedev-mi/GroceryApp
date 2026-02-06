@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,8 +10,61 @@ import ProductItem from '../../../components/ProductItem';
 import SearchBar from '../../../components/SearchBar';
 import { categories, products } from '../../../data/dummyData';
 
+const BANNERS = [
+  {
+    id: 1,
+    title: "Fresh & Organic",
+    subtitle: "Get 20% off on first order",
+    image: "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
+    bg: "#EFF9F0",
+    btnColor: colors.brand[700]
+  },
+  {
+    id: 2,
+    title: "Flash Sale",
+    subtitle: "Up to 50% off on Snacks",
+    image: "https://cdn-icons-png.flaticon.com/512/2553/2553691.png",
+    bg: "#FFF4E3",
+    btnColor: "#FF9800"
+  },
+  {
+    id: 3,
+    title: "Mega Deal",
+    subtitle: "Buy 1 Get 1 Free on Oils",
+    image: "https://cdn-icons-png.flaticon.com/512/2829/2829824.png",
+    bg: "#E3F2FD",
+    btnColor: "#2196F3"
+  }
+];
+
 export default function Home() {
   const router = useRouter();
+  const bannerRef = useRef<ScrollView>(null);
+  const [activeBanner, setActiveBanner] = useState(0);
+
+  // Auto-slide effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveBanner((prev) => {
+        const nextIndex = (prev + 1) % BANNERS.length;
+        // Calculate offset: Width (300) + gap (16) = 316
+        // Initial padding is 20, but snapToInterval handles relative snapping.
+        // Usually plain scrollTo works best with a calculated x.
+        // We'll trust the calculated offset.
+        bannerRef.current?.scrollTo({
+          x: nextIndex * 316,
+          animated: true
+        });
+        return nextIndex;
+      });
+    }, 5000); // 5 second auto-slide as requested.
+    // User explicitly asked for 1sec.
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Use a second effect to reset interval if user manually scrolls? 
+  // For simplicity MVP: just strict interval.
 
   // Mock location
   const location = "Home - 123, Green Street, New York";
@@ -23,19 +77,27 @@ export default function Home() {
       <View style={styles.header}>
         <View style={styles.locationContainer}>
           <View style={styles.locationIconBg}>
-            <Ionicons name="location" size={18} color={colors.brand[700]} />
+            <Ionicons name="location-sharp" size={24} color={colors.brand[700]} />
           </View>
-          <View>
-            <Text style={styles.deliveryTo}>Delivery to</Text>
-            <Text style={styles.locationText} numberOfLines={1}>{location}</Text>
+          <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.deliveryTo}>Home</Text>
+              <Ionicons name="chevron-down" size={16} color="#111" style={{ marginLeft: 4, marginTop: 2 }} />
+            </View>
+            <Text style={styles.locationText} numberOfLines={1}>123, Green Street, New York, USA</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.profileBtn}>
-          <Image
-            source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
-            style={styles.profileImg}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <TouchableOpacity onPress={() => router.push('/wishlist')}>
+            <Ionicons name="heart-outline" size={26} color="#1F2937" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileBtn}>
+            <Image
+              source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+              style={styles.profileImg}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.searchContainer}>
@@ -44,19 +106,38 @@ export default function Home() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
-        {/* Banner (Optional) */}
-        <View style={styles.banner}>
-          <View>
-            <Text style={styles.bannerTitle}>Fresh & Organic</Text>
-            <Text style={styles.bannerSubtitle}>Get 20% off on first order</Text>
-            <TouchableOpacity style={styles.bannerBtn}>
-              <Text style={styles.bannerBtnText}>Order Now</Text>
-            </TouchableOpacity>
-          </View>
-          <Image
-            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3081/3081986.png' }}
-            style={styles.bannerImage}
-          />
+        {/* Banner Slider */}
+        <View style={styles.bannerContainer}>
+          <ScrollView
+            ref={bannerRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.bannerScroll}
+            decelerationRate="fast"
+            snapToInterval={316} // Width (300) + gap (16)
+            snapToAlignment="start"
+            onMomentumScrollEnd={(ev) => {
+              // Update active index if user manually scrolls
+              const newIndex = Math.round(ev.nativeEvent.contentOffset.x / 316);
+              setActiveBanner(newIndex);
+            }}
+          >
+            {BANNERS.map((banner) => (
+              <View key={banner.id} style={[styles.banner, { backgroundColor: banner.bg }]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.bannerTitle}>{banner.title}</Text>
+                  <Text style={styles.bannerSubtitle}>{banner.subtitle}</Text>
+                  <TouchableOpacity style={[styles.bannerBtn, { backgroundColor: banner.btnColor }]}>
+                    <Text style={styles.bannerBtnText}>Order Now</Text>
+                  </TouchableOpacity>
+                </View>
+                <Image
+                  source={{ uri: banner.image }}
+                  style={styles.bannerImage}
+                />
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Categories */}
@@ -65,7 +146,7 @@ export default function Home() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
             {categories.map((cat) => (
               <View key={cat.id} style={styles.catItem}>
-                <CategoryCard category={cat} onPress={() => { }} />
+                <CategoryCard category={cat} onPress={() => router.push(`/categories/category/${cat.id}` as any)} />
               </View>
             ))}
           </ScrollView>
@@ -95,8 +176,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFF',
   },
   locationContainer: {
     flexDirection: 'row',
@@ -105,32 +187,33 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   locationIconBg: {
-    width: 36,
-    height: 36,
-    backgroundColor: '#F2F2F2',
-    borderRadius: 18,
+    marginRight: 8,
+    // Removed contrast circle, just the icon looks cleaner typically or simple bg
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    backgroundColor: '#FFF9E6', // Very light brand yellow
+    borderRadius: 8,
   },
   deliveryTo: {
-    fontSize: 12,
-    color: colors.neutral.textSecondary,
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    fontSize: 16, // Larger title
+    color: '#111',
+    fontWeight: '800', // Bold for "Home"
   },
   locationText: {
-    fontSize: 14,
-    color: colors.neutral.text,
-    fontWeight: '700',
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+    marginTop: 1,
   },
   profileBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: colors.brand[500],
+    borderWidth: 1, // Thinner border
+    borderColor: '#E5E7EB',
   },
   profileImg: {
     width: '100%',
@@ -143,9 +226,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 20,
   },
-  banner: {
-    marginHorizontal: 20,
+  bannerContainer: {
     marginBottom: 24,
+  },
+  bannerScroll: {
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  banner: {
+    width: 300,
     backgroundColor: '#EFF9F0', // Soft green/yellow hint
     borderRadius: 20,
     padding: 20,
@@ -197,6 +286,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   catItem: {
-    width: 90,
+    width: 100,
   }
 });

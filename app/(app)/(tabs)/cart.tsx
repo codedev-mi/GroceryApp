@@ -16,8 +16,11 @@ export default function Cart() {
   const items = useSelector((state: RootState) => state.cart.items);
   // Calculate total
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const deliveryFee = subtotal > 0 ? 40 : 0;
-  const total = subtotal + deliveryFee;
+  const deliveryFee = subtotal > 199 ? 0 : 40;
+  const smallOrderPenalty = subtotal < 100 ? 30 : 0;
+  const platformFee = Number((subtotal * 0.025).toFixed(2)); // 0.25% platform fee
+
+  const total = subtotal + deliveryFee + smallOrderPenalty + platformFee;
 
   if (items.length === 0) {
     return (
@@ -25,7 +28,7 @@ export default function Cart() {
         <View style={styles.emptyContainer}>
           <Ionicons name="cart-outline" size={80} color={colors.neutral.muted} />
           <Text style={styles.emptyText}>Your cart is empty</Text>
-          <TouchableOpacity style={styles.startShoppingBtn} onPress={() => router.push('/')}>
+          <TouchableOpacity style={styles.startShoppingBtn} onPress={() => router.push('/' as any)}>
             <Text style={styles.startShoppingText}>Start Shopping</Text>
           </TouchableOpacity>
         </View>
@@ -81,10 +84,20 @@ export default function Cart() {
             <Text style={styles.billLabel}>Delivery Fee</Text>
             <Text style={styles.billValue}>₹{deliveryFee}</Text>
           </View>
+          {smallOrderPenalty > 0 && (
+            <View style={styles.billRow}>
+              <Text style={styles.billLabel}>Small Order Penalty</Text>
+              <Text style={styles.billValue}>₹{smallOrderPenalty}</Text>
+            </View>
+          )}
+          <View style={styles.billRow}>
+            <Text style={styles.billLabel}>Platform Fee</Text>
+            <Text style={styles.billValue}>₹{platformFee}</Text>
+          </View>
           <View style={styles.divider} />
           <View style={styles.billRow}>
             <Text style={styles.totalLabel}>Grand Total</Text>
-            <Text style={styles.totalValue}>₹{total}</Text>
+            <Text style={styles.totalValue}>₹{total.toFixed(2)}</Text>
           </View>
         </View>
       </ScrollView>
@@ -92,7 +105,7 @@ export default function Cart() {
       <View style={styles.footer}>
         <View>
           <Text style={styles.footerTotalLabel}>Total</Text>
-          <Text style={styles.footerTotalValue}>₹{total}</Text>
+          <Text style={styles.footerTotalValue}>₹{total.toFixed(2)}</Text>
         </View>
         <TouchableOpacity style={styles.checkoutBtn}>
           <Text style={styles.checkoutText}>Proceed to Pay</Text>

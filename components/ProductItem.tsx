@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { colors } from '@/colors';
 import { RootState } from '../store';
 import { addToCart, removeFromCart } from '../store/slices/cartSlice';
+import { toggleWishlist } from '../store/slices/wishlistSlice';
 import { Product } from '../types';
 
 export default function ProductItem({ product }: { product: Product }) {
@@ -14,6 +15,10 @@ export default function ProductItem({ product }: { product: Product }) {
   const router = useRouter();
   const cartItem = useSelector((state: RootState) =>
     state.cart.items.find(i => i.id === product.id)
+  );
+
+  const isInWishlist = useSelector((state: RootState) =>
+    state.wishlist.items.some(i => i.id === product.id)
   );
 
   const handlePress = () => {
@@ -33,6 +38,10 @@ export default function ProductItem({ product }: { product: Product }) {
     dispatch(removeFromCart(product.id));
   };
 
+  const handleWishlist = () => {
+    dispatch(toggleWishlist(product));
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -46,6 +55,14 @@ export default function ProductItem({ product }: { product: Product }) {
           contentFit="contain"
           transition={200}
         />
+        {/* Wishlist Button - Absolute inside image wrapper */}
+        <TouchableOpacity onPress={handleWishlist} style={styles.wishlistBtn}>
+          <Ionicons
+            name={isInWishlist ? "heart" : "heart-outline"}
+            size={16}
+            color={isInWishlist ? "#EF4444" : "#9CA3AF"}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -107,10 +124,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative', // for absolute wishlist btn
   },
   image: {
     width: 70,
     height: 70,
+  },
+  wishlistBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
   },
   content: {
     flex: 1,
@@ -191,3 +228,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
 });
+
